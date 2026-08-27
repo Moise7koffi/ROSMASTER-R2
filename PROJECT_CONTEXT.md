@@ -144,6 +144,10 @@ utiliser `/dev/ttyUSB0`.
 - Source : `~/Rosmaster/py_install/Rosmaster_Lib/Rosmaster_Lib.py` (1331 lignes)
 - Dépendance : pyserial 3.5
 - Ne jamais utiliser un package pip aléatoire.
+- **Le clone YAHBOOM ne contient AUCUN code source** (ni `.py`/`.cpp`/`.h` hors nos
+  scripts) : uniquement des PDF de cours. Le driver réellement utilisé par la carte
+  est bien Rosmaster_Lib (source séparée). `set_motor()` = commande moteur bas
+  niveau validée (PWM brut sur les 4 canaux physiques).
 
 ### Constructeur
 
