@@ -299,29 +299,31 @@ Contexte : batterie **7,1V** (système prévu en DC 12V).
 
 ---
 
-## 2026-08-27 — Session Documentation & Git
+## 2026-08-27 — Sauvegarde et documentation Git
 
 ### Objectif
 
 - Prendre en charge la documentation du projet et la sauvegarde Git.
-- Documenter TOUT ce qui a été réalisé (machine, carte, lib, moteurs, IMU, PID).
-- Vérifier SSH/clé Git et préparer le commit + push.
+- Sauvegarder proprement le projet sur le dépôt GitHub **privé** :
+  `Moise7koffi/ROSMASTER-R2` (`git@github.com:Moise7koffi/ROSMASTER-R2.git`).
+- Vérifier SSH/clé Git et effectuer le commit + push.
 
 ### Actions
 
 - Vérification de l'état réel du dépôt (`git status`, `git log`, `git remote -v`).
 - Vérification des infos Git (`user.name`, `user.email`) et des fichiers `~/.ssh`
-  (sans exposer la clé privée).
+  (clé **publique** `.pub` uniquement — jamais la privée).
 - Connexion SSH GitHub testée : **authentifié en tant que `Moise7koffi`** ✅.
-- Constat : le remote `origin` pointe vers **le repo YAHBOOM d'origine (HTTPS)** :
-  on n'y poussera PAS tel quel.
-- Réécriture de `PROJECT_CONTEXT.md` avec toutes les sections demandées
-  (Historique, État actuel, Matériel, Comms Pi↔PC et Pi↔carte, Rosmaster_Lib,
-  USB, IMU, Encodeurs, PID, Moteurs, Problèmes, Commandes, Erreurs, Étapes).
-- Ajout de cette section chronologique dans `SESSION_LOG.md`.
-- Ajout d'un `.gitignore` pour exclure `__pycache__/`.
+- Constat : `origin` = **repo YAHBOOM d'origine (HTTPS)** → conservé tel quel ;
+  le dépôt personnel est ajouté en remote séparé pour le push.
+- Scan des secrets : **aucun secret dans les fichiers commités** ✅.
+- Réécriture de `PROJECT_CONTEXT.md` (toutes sections : Historique, État actuel,
+  Matériel, Comms Pi↔PC / Pi↔carte, Rosmaster_Lib, USB, IMU, Encodeurs, PID,
+  Moteurs, Problèmes, Commandes, Erreurs, Architecture, Objectif).
+- Ajout de la présente entrée chronologique dans `SESSION_LOG.md`.
+- Ajout d'un `.gitignore` (exclusion `__pycache__/`, `*.pyc`).
 
-### Commandes
+### Commandes importantes
 
 ```bash
 git status
@@ -334,34 +336,39 @@ ls -la ~/.ssh
 cat ~/.ssh/id_ed25519.pub          # clé PUBLIQUE uniquement
 ssh -T git@github.com              # test SSH
 hostname -I                        # IP actuelle : 192.168.137.48
+git diff --cached --check
+git grep -n -i -E "id_ed25519|token|password|\.env|pem|key"   # scan secrets
+git add PROJECT_CONTEXT.md SESSION_LOG.md .gitignore <scripts>
+git commit -m "docs: document Raspberry Pi and Rosmaster setup"
+git remote add backup git@github.com:Moise7koffi/ROSMASTER-R2.git
+git push -u backup main
 ```
 
 ### Résultats
 
-- IP actuelle : **192.168.137.48** (confirmé DHCP dynamique : .152 → .96 → .48).
+- IP actuelle : **192.168.137.48** (DHCP dynamique ; déjà .152 puis .96).
 - SSH GitHub OK (`Moise7koffi`).
 - Git config renseignée : `Moïse KOFFI` / `moise7koffi@gmail.com`.
-- Remote `origin` = YAHBOOM (HTTPS) — seul obstacle au push : choisir un repo cible.
-- Documentation consolidée.
+- Remote `origin` = YAHBOOM inchangé ; remote `backup` = repo perso ajouté.
+- Documentation consolidée ; commit local créé.
 
-### Erreurs
+### Erreurs rencontrées
 
+- Point d'attention initial : `origin` = repo YAHBOOM → pas d'accès push direct.
 - Aucune erreur bloquante cette session.
-- Point d'attention : **remote origin = repo YAHBOOM** → pas d'accès push.
 
 ### Solutions
 
-- Pour pousser : décision utilisateur requise (créer un fork/new repo sous
-  `Moise7koffi` et l'ajouter comme remote, ou remplacer `origin`). Ne pas
-  modifier le remote sans accord.
-- `gh` CLI non installé → création de repo à faire côté GitHub (web ou autre).
+- Repository personnel privé créé par l'utilisateur et ajouté en remote `backup`
+  (l'upstream YAHBOOM reste disponible via `origin`).
+- Aucun secret committé ; clé privée jamais exposée.
 
 ### État final
 
-- Propulsion validée ; IMU live ; carte réglée en R2 ; sonde PID OK.
-- Documentation à jour ; commit local en préparation ; push en attente de cible.
+- Propulsion M1+M3 validée ; IMU live ; carte réglée en R2 ; sonde PID OK.
+- Documentation à jour ; commit créé ; push vers `backup` effectué.
 
 ### Prochaine étape
 
-- Dire à OpenCode où pousser (repo perso), puis `git commit` + `git push`.
-- Ensuite : finaliser le PID d'équilibre (rock doux + KP croissant).
+- Reprendre le développement moteur (protocole YAHBOOM vérifié dans le code, puis
+  finaliser le PID d'équilibre : rock doux pour affiner la cible + KP croissant).
